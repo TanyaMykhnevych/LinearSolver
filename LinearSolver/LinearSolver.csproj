@@ -6,6 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="MatrixInverseProgram.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Images\" />
   </ItemGroup>
 

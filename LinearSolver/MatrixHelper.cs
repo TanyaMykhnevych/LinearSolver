@@ -17,6 +17,6 @@
                 for (int j = 0; j < matrix[i].Length; ++j)
                     result[i][j] = matrix[i][j];
             return result;
-        }
+        }        
     }
 }
