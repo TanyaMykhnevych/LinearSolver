@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace LinearSolver
 {
@@ -12,9 +14,9 @@ namespace LinearSolver
     // Lab 2
     public static class CholeskySolver
     {
-        public static double[] Solve(double[][] matrix, double[] b)
+        public static double[] Solve(double[][] matrix, double[] b, bool parallel = false)
         {
-            var L = CholeskyDecomposition(matrix);
+            var L = parallel ? CholeskyDecompositionParallel(matrix) : CholeskyDecomposition(matrix);
 
             var U = Transpose(L);
 
@@ -36,25 +38,52 @@ namespace LinearSolver
                 {
                     double sum = 0;
 
+                    // Evaluating L(i, j)
+                    // using L(j, j)
+                    for (int k = 0; k < j; k++)
+                        sum += (lower[i][k] * lower[j][k]);
+
                     // summation for diagnols
                     if (j == i)
                     {
-                        for (int k = 0; k < j; k++)
-                            sum += (int)Math.Pow(lower[j][k],
-                                                 2);
-                        lower[j][j] = (int)Math.Sqrt(
-                            matrix[j][j] - sum);
+                        lower[j][j] = Math.Sqrt(matrix[j][j] - sum);
                     }
-
                     else
                     {
+                        lower[i][j] = (matrix[i][j] - sum) / lower[j][j];
+                    }
+                }
+            }
 
-                        // Evaluating L(i, j)
-                        // using L(j, j)
-                        for (int k = 0; k < j; k++)
-                            sum += (lower[i][k] * lower[j][k]);
-                        lower[i][j] = (matrix[i][j] - sum)
-                                      / lower[j][j];
+            return lower;
+        }
+
+        private static double[][] CholeskyDecompositionParallel(double[][] matrix)
+        {
+            double[][] lower = MatrixHelper.MatrixCreate(matrix.Length, matrix.Length);
+
+            // Decomposing a matrix
+            // into Lower Triangular
+            for (int i = 0; i < matrix.Length; i++)
+            {
+                for (int j = 0; j <= i; j++)
+                {
+                    // Evaluating L(i, j)
+                    // using L(j, j)
+                    double sum = 0;
+                    Parallel.For(0, j, k =>
+                    {
+                        sum += (lower[i][k] * lower[j][k]);
+                    });
+
+                    // summation for diagnols
+                    if (j == i)
+                    {
+                        lower[j][j] = Math.Sqrt(matrix[j][j] - sum);
+                    }
+                    else
+                    {
+                        lower[i][j] = (matrix[i][j] - sum) / lower[j][j];
                     }
                 }
             }

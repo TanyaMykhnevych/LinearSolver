@@ -51,9 +51,13 @@ namespace LinearSolver
             Stopwatch watch = Stopwatch.StartNew();
             var res = CholeskySolver.Solve(matrix, b);
             watch.Stop();
-            Console.WriteLine($"Sequential solving time = {watch.ElapsedMilliseconds} ms\n");
+            Console.WriteLine($"Sequential solving time = {watch.ElapsedMilliseconds} ms");
 
             watch.Reset();
+            watch.Start();
+            double[] resPar = CholeskySolver.Solve(matrix, b, true);
+            watch.Stop();
+            Console.WriteLine($"Parallel solving time = {watch.ElapsedMilliseconds} ms\n");
         }
 
         private static double[][] GetGreenValuesMatrix(Bitmap bmp, int n)
