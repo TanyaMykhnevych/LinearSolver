@@ -11,14 +11,18 @@ namespace LinearSolver
         {
             Bitmap bpm = new Bitmap(Image.FromFile(Path.Combine(@"..\..\..\Images\picture.jpg")));
 
-            Solve(bpm, 10);
-            Solve(bpm, 100);
-            Solve(bpm, 500);
+            SolveMatrix(bpm, 10);
+            SolveMatrix(bpm, 100);
+            SolveMatrix(bpm, 500);
+
+            SolveCholetsky(bpm, 10);
+            SolveCholetsky(bpm, 100);
+            SolveCholetsky(bpm, 500);
 
             Console.ReadLine();
         }
 
-        private static void Solve(Bitmap bpm, int n)
+        private static void SolveMatrix(Bitmap bpm, int n)
         {
             Console.WriteLine($"Started solving for N = {n}");
 
@@ -34,9 +38,22 @@ namespace LinearSolver
             watch.Start();
             double[] resPar = ParallelMatrixSolver.Solve(matrix, b);
             watch.Stop();
-            Console.WriteLine($"Parallel solving time = {watch.ElapsedMilliseconds} ms");
+            Console.WriteLine($"Parallel solving time = {watch.ElapsedMilliseconds} ms\n");
+        }
 
-            Console.WriteLine();
+        private static void SolveCholetsky(Bitmap bpm, int n)
+        {
+            Console.WriteLine($"Started solving Choletsky for N = {n}");
+
+            double[][] matrix = GetGreenValuesMatrix(bpm, n);
+            double[] b = GetGreenValuesColumn(bpm, n);
+
+            Stopwatch watch = Stopwatch.StartNew();
+            var res = CholeskySolver.Solve(matrix, b);
+            watch.Stop();
+            Console.WriteLine($"Sequential solving time = {watch.ElapsedMilliseconds} ms\n");
+
+            watch.Reset();
         }
 
         private static double[][] GetGreenValuesMatrix(Bitmap bmp, int n)
