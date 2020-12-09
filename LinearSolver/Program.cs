@@ -11,13 +11,19 @@ namespace LinearSolver
         {
             Bitmap bpm = new Bitmap(Image.FromFile(Path.Combine(@"..\..\..\Images\picture.jpg")));
 
-            SolveMatrix(bpm, 10);
-            SolveMatrix(bpm, 100);
-            SolveMatrix(bpm, 500);
+            //SolveMatrix(bpm, 10);
+            //SolveMatrix(bpm, 100);
+            //SolveMatrix(bpm, 500);
 
-            SolveCholetsky(bpm, 10);
-            SolveCholetsky(bpm, 100);
-            SolveCholetsky(bpm, 500);
+            //SolveCholetsky(bpm, 10);
+            //SolveCholetsky(bpm, 100);
+            //SolveCholetsky(bpm, 500);
+
+            //SolveBlockDiagonal(bpm, 500);
+
+            SolveJacobi(bpm, 10);
+            SolveJacobi(bpm, 100);
+            SolveJacobi(bpm, 500);
 
             Console.ReadLine();
         }
@@ -58,6 +64,44 @@ namespace LinearSolver
             double[] resPar = CholeskySolver.Solve(matrix, b, true);
             watch.Stop();
             Console.WriteLine($"Parallel solving time = {watch.ElapsedMilliseconds} ms\n");
+        }
+
+        private static void SolveBlockDiagonal(Bitmap bpm, int n)
+        {
+            Console.WriteLine($"Started solving block diagonal for N = {n}");
+
+            double[][] matrix = GetGreenValuesMatrix(bpm, n);
+            double[] b = GetGreenValuesColumn(bpm, n);
+
+            Stopwatch watch = Stopwatch.StartNew();
+            double[] resSeq = BlockDiagonalSolver.Solve(matrix, b);
+            watch.Stop();
+            Console.WriteLine($"Sequential block diagonal solving time = {watch.ElapsedMilliseconds} ms");
+
+            watch.Reset();
+            watch.Start();
+            double[] resPar = ParallelBlockDiagonalSolver.Solve(matrix, b, true);
+            watch.Stop();
+            Console.WriteLine($"Parallel block diagonal solving time = {watch.ElapsedMilliseconds} ms\n");
+        }
+
+        private static void SolveJacobi(Bitmap bpm, int n)
+        {
+            Console.WriteLine($"Started solving Jacobi for N = {n}");
+
+            double[][] matrix = GetGreenValuesMatrix(bpm, n);
+            double[] b = GetGreenValuesColumn(bpm, n);
+
+            Stopwatch watch = Stopwatch.StartNew();
+            double[] resSeq = JacobiSolver.Solve(matrix, b);
+            watch.Stop();
+            Console.WriteLine($"Sequential block diagonal solving time = {watch.ElapsedMilliseconds} ms");
+
+            watch.Reset();
+            watch.Start();
+            double[] resPar = ParallelJacobiSolver.Solve(matrix, b);
+            watch.Stop();
+            Console.WriteLine($"Parallel block diagonal solving time = {watch.ElapsedMilliseconds} ms\n");
         }
 
         private static double[][] GetGreenValuesMatrix(Bitmap bmp, int n)
