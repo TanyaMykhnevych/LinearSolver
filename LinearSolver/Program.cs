@@ -20,6 +20,7 @@ namespace LinearSolver
             //SolveCholetsky(bpm, 500);
 
             //SolveBlockDiagonal(bpm, 500);
+            SolveJacobi(bpm, 100);
 
             SolveJacobi(bpm, 10);
             SolveJacobi(bpm, 100);
@@ -88,20 +89,34 @@ namespace LinearSolver
         private static void SolveJacobi(Bitmap bpm, int n)
         {
             Console.WriteLine($"Started solving Jacobi for N = {n}");
+            Console.WriteLine($"------------------------------------");
 
             double[][] matrix = GetGreenValuesMatrix(bpm, n);
+            double[][] sparsedMatrix = MatrixHelper.SparseMatrix(matrix);
             double[] b = GetGreenValuesColumn(bpm, n);
 
             Stopwatch watch = Stopwatch.StartNew();
             double[] resSeq = JacobiSolver.Solve(matrix, b);
             watch.Stop();
-            Console.WriteLine($"Sequential block diagonal solving time = {watch.ElapsedMilliseconds} ms");
+            Console.WriteLine($"Sequential Jacobi solving time = {watch.ElapsedMilliseconds} ms");
+
+            watch.Reset();
+            watch.Start();
+            double[] resSeq2 = JacobiSolver.Solve(sparsedMatrix, b);
+            watch.Stop();
+            Console.WriteLine($"Sequential Jacobi for sparse matrix solving time = {watch.ElapsedMilliseconds} ms");
 
             watch.Reset();
             watch.Start();
             double[] resPar = ParallelJacobiSolver.Solve(matrix, b);
             watch.Stop();
-            Console.WriteLine($"Parallel block diagonal solving time = {watch.ElapsedMilliseconds} ms\n");
+            Console.WriteLine($"Parallel Jacobi solving time = {watch.ElapsedMilliseconds} ms");
+
+            watch.Reset();
+            watch.Start();
+            double[] resPar2 = ParallelJacobiSolver.Solve(sparsedMatrix, b);
+            watch.Stop();
+            Console.WriteLine($"Parallel Jacobi for sparse matrix solving time = {watch.ElapsedMilliseconds} ms\n");
         }
 
         private static double[][] GetGreenValuesMatrix(Bitmap bmp, int n)

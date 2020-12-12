@@ -38,5 +38,21 @@ namespace LinearSolver
 
             return result;
         }
+
+        public static double[][] SparseMatrix(double[][] matrix)
+        {
+            int blockSize = matrix.Length / 5;
+            double[][] result = MatrixCreate(matrix.Length, matrix[0].Length);
+            for (int i = 0; i < matrix.Length; i++)
+            {
+                int finish = i / blockSize * blockSize + blockSize;
+                for (int j = i / blockSize * blockSize; j < finish; j++)
+                {
+                    result[i][j] = matrix[i][j];
+                }
+            }
+
+            return result;
+        }
     }
 }
